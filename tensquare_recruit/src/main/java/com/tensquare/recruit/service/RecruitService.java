@@ -39,12 +39,21 @@ public class RecruitService {
 	@Autowired
 	private IdWorker idWorker;
 
+
 	/**
-	 * 查询全部列表
+	 * 查询推荐职位
 	 * @return
 	 */
-	public List<Recruit> findAll() {
-		return recruitDao.findAll();
+	public List<Recruit> recommend() {
+		return recruitDao.findTop6ByStateOrderByCreatetimeDesc("2");
+	}
+
+	/**
+	 * 查询最新职位
+	 * @return
+	 */
+	public List<Recruit> newlist() {
+		return recruitDao.findTop6ByStateNotOrderByCreatetimeDesc("0");
 	}
 
 	

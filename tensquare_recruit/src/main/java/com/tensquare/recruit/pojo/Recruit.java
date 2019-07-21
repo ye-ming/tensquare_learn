@@ -15,9 +15,6 @@ public class Recruit implements Serializable{
 
 	@Id
 	private String id;//ID
-
-
-	
 	private String jobname;//职位名称
 	private String salary;//薪资范围
 	private String condition;//经验要求
