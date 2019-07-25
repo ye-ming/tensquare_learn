@@ -2,9 +2,12 @@ package com.tensquare.spit.controller;
 
 import com.tensquare.spit.pojo.Spit;
 import com.tensquare.spit.service.SpitService;
+import entity.PageResult;
 import entity.Result;
 import entity.StatusCode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -18,6 +21,9 @@ public class SpitController {
 
     @Autowired
     private SpitService spitService;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @GetMapping
     public Result findAll(){
@@ -46,5 +52,22 @@ public class SpitController {
     public Result deleteById(@PathVariable String spitId){
         spitService.deleteById(spitId);
         return new Result(true, StatusCode.OK,"新增成功");
+    }
+
+    @GetMapping("comment/{parentid}/{page}/{size}")
+    public Result findByParentid(@PathVariable String parentid,@PathVariable int page,@PathVariable int size){
+        Page<Spit> pageDate = spitService.findByParentid(parentid, page, size);
+        return new Result(true,StatusCode.OK,"查询成功", new PageResult<Spit>(pageDate.getTotalElements(),pageDate.getContent()));
+    }
+
+    @PutMapping("thumbup/{spitId}")
+    public Result thumbup(@PathVariable String spitId){
+        String userId = "1324";
+        if(redisTemplate.opsForValue().get("thumbup_"+userId) != null){
+            return new Result(false,StatusCode.REPERROR,"不能重复点赞");
+        }
+        spitService.thumbup(spitId);
+        redisTemplate.opsForValue().set("thumbup_"+userId,12);
+        return new Result(true,StatusCode.OK,"点赞成功");
     }
 }
